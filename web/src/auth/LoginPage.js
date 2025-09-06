@@ -825,6 +825,7 @@ class LoginPage extends React.Component {
               className="login-username-input"
               prefix={<UserOutlined className="site-form-item-icon" />}
               placeholder={this.getPlaceholder(signinItem.placeholder)}
+              defaultValue={this.state.prefilledUsername}
               onChange={e => {
                 this.setState({
                   username: e.target.value,
@@ -1027,7 +1028,7 @@ class LoginPage extends React.Component {
             organization: application.organization,
             application: application.name,
             autoSignin: !application?.signinItems.map(signinItem => signinItem.name === "Forgot password?" && signinItem.rule === "Auto sign in - False")?.includes(true),
-            username: this.state.prefilledUsername || (Conf.ShowGithubCorner ? "admin" : ""),
+            username: Conf.ShowGithubCorner ? "admin" : "",
             password: Conf.ShowGithubCorner ? "123" : "",
           }}
           onFinish={(values) => {
