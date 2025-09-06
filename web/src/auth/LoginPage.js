@@ -70,6 +70,7 @@ class LoginPage extends React.Component {
       loginLoading: false,
       userCode: props.userCode ?? (props.match?.params?.userCode ?? null),
       userCodeStatus: "",
+      prefilledUsername: null,
     };
 
     if (this.state.type === "cas" && props.match?.params.casApplicationName !== undefined) {
@@ -80,6 +81,21 @@ class LoginPage extends React.Component {
     localStorage.setItem("signinUrl", window.location.pathname + window.location.search);
 
     this.form = React.createRef();
+    this.extractUsernameFromUrlParams();
+  }
+
+  extractUsernameFromUrlParams() {
+    const urlParams = new URLSearchParams(this.props.location?.search);
+    let prefilledUsername = null;
+    if (this.state.type === "saml") {
+      prefilledUsername = urlParams.get("username") || urlParams.get("login_hint");
+    }
+    else if (this.state.type === "code" || this.state.type === "login") {
+      prefilledUsername = urlParams.get("login_hint");
+    }
+    if (prefilledUsername) {
+      this.setState({ prefilledUsername });
+    }
   }
 
   componentDidMount() {
@@ -1011,7 +1027,7 @@ class LoginPage extends React.Component {
             organization: application.organization,
             application: application.name,
             autoSignin: !application?.signinItems.map(signinItem => signinItem.name === "Forgot password?" && signinItem.rule === "Auto sign in - False")?.includes(true),
-            username: Conf.ShowGithubCorner ? "admin" : "",
+            username: this.state.prefilledUsername || (Conf.ShowGithubCorner ? "admin" : ""),
             password: Conf.ShowGithubCorner ? "123" : "",
           }}
           onFinish={(values) => {
